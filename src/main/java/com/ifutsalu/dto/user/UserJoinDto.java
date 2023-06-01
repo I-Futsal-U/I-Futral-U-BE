@@ -1,11 +1,14 @@
 package com.ifutsalu.dto.user;
 
 import com.ifutsalu.domain.User;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Data
+@Builder
+@Getter
 public class UserJoinDto {
 
     private String email;
