@@ -29,7 +29,7 @@ public class AuthController {
      * @param userRequestDto 회원 가입 요청 정보
      * @return 회원 가입 결과 메시지
      */
-    @Operation(summary = "회원가입", description = "회원가입.", tags = {"AuthController"})
+    @Operation(summary = "회원가입", description = "회원가.", tags = {"AuthController"})
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "404", description = "Not found")
     @PostMapping("/join")
@@ -45,6 +45,8 @@ public class AuthController {
      * @return 로그인 결과를 담은 토큰 응답 DTO
      */
     @Operation(summary = "로그인", description = "로그인", tags = {"AuthController"})
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(authService.login(userRequestDto));
@@ -57,6 +59,8 @@ public class AuthController {
      * @return 재발급된 토큰 응답 DTO
      */
     @Operation(summary = "토큰 재발급", description = "토큰 재발급", tags = {"AuthController"})
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     @PostMapping("/reissue")
     public ResponseEntity<TokenResponseDto> reissue(@RequestBody TokenRequestDto tokenRequestDto) {
         return ResponseEntity.ok(authService.reissue(tokenRequestDto));
