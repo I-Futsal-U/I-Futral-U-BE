@@ -1,20 +1,25 @@
 package com.ifutsalu.controller;
 
 import com.ifutsalu.domain.match.Matching;
+import com.ifutsalu.dto.response.MatchResponseDto;
 import com.ifutsalu.dto.response.WeeklyMatchResponseDto;
 import com.ifutsalu.service.MatchDummyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "MatchController", description = "매치 컨트롤러")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/match")
 public class MatchingController {
+
     private final MatchDummyService matchDummyService;
 
     /**
@@ -22,9 +27,36 @@ public class MatchingController {
      */
     @Operation(summary = "오늘 날짜 기준으로 일주일치 매칭 정보 제공", description = "일주일 분량의 매칭 정보를 제공합니다.", tags = {"MatchController"})
     @ApiResponse(responseCode = "200", description = "요일 별 매칭 정보를 반환합니다.")
+    @ApiResponse(responseCode = "404", description = "요일 별 매칭 정보를 찾을 수 없습니다.")
     @GetMapping("/weekly")
     public ResponseEntity<WeeklyMatchResponseDto> getWeekMatches() {
         return ResponseEntity.ok(matchDummyService.mockMatchResponseData());
+    }
+
+    /**
+     * 특정 유저가 예약한 매칭 정보 제공
+     */
+    @Operation(summary = "특정 유저가 예약한 매칭 정보 제공", description = "특정 유저가 예약한 매칭 정보를 조회합니다", tags = {"MatchController"})
+    @ApiResponse(responseCode = "200", description = "유저가 예약한 매칭 정보를 반환합니다.")
+    @ApiResponse(responseCode = "404", description = "유저가 예약한 매칭 정보를 찾을 수 없습니다.")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<MatchResponseDto>> getMatchesByUserId(@Parameter(description = "유저 ID", example = "1") @PathVariable("userId") Long userId) {
+        // List<MatchResponseDto> matchResponseDtos = matchingTestService.getMatchesByUserId(userId);
+        List<MatchResponseDto> matchResponseDtos = matchDummyService.createMockMatches(userId);
+        return ResponseEntity.ok(matchResponseDtos);
+    }
+
+    /**
+     * 특정  매니저가 담당하고 있는 매칭 정보 제공
+     */
+    @Operation(summary = "특정  매니저가 담당하고 있는 매칭 정보 제공", description = "특정 매니저가 담당하고 있는 매칭 정보를 제공합니다", tags = {"MatchController"})
+    @ApiResponse(responseCode = "200", description = "매니저가 담당하고 있는 매칭 정보를 반환합니다.")
+    @ApiResponse(responseCode = "404", description = "매니저가 담당하고 있는 매칭 정보를 찾을 수 없습니다.")
+    @GetMapping("/manager/{userId}")
+    public ResponseEntity<List<MatchResponseDto>> getMatchesByManager(@Parameter(description = "유저 ID(user의 권한은 매니저라고 가정)", example = "1") @PathVariable("userId") Long userId) {
+        // List<MatchResponseDto> matchResponseDtos = matchingTestService.getMatchesByManager(userId);
+        List<MatchResponseDto> matchResponseDtos = matchDummyService.createMockMatches(userId);
+        return ResponseEntity.ok(matchResponseDtos);
     }
 
     /**
