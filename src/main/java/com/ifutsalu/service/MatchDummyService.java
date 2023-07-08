@@ -1,17 +1,18 @@
 package com.ifutsalu.service;
 
-import com.ifutsalu.domain.match.LimitGender;
-import com.ifutsalu.domain.match.LimitLevel;
-import com.ifutsalu.domain.match.LimitShoes;
-import com.ifutsalu.domain.match.MatchStatus;
+import com.ifutsalu.domain.match.*;
 import com.ifutsalu.dto.response.MatchResponseDto;
 import com.ifutsalu.dto.response.WeeklyMatchResponseDto;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
 public class MatchDummyService {
+
     public WeeklyMatchResponseDto mockMatchResponseData() {
         // 하루에 3타임 기준
         LocalDateTime startTime0 = LocalDateTime.of(2023, 06, 26, 16, 00);
@@ -228,5 +229,58 @@ public class MatchDummyService {
                 .sun(List.of(data12, data13))
                 .build();
         return result;
+    }
+
+    public List<MatchResponseDto> createMockMatches(Long userId) {
+        List<MatchResponseDto> mockMatches = new ArrayList<>();
+        mockMatches.add(MatchResponseDto.builder()
+                .startTime(LocalDateTime.now())
+                .finishTime(LocalDateTime.now().plusHours(2))
+                .minNumber(8)
+                .maxNumber(10)
+                .number(7)
+                .rule(String.valueOf(Rule.FIVE_VS_FIVE_TWO_TEAM))
+                .matchStatus(String.valueOf(MatchStatus.OPEN))
+                .limitLevel(String.valueOf(LimitLevel.UPPER_AMATEUR))
+                .limitShoes(String.valueOf(LimitShoes.ONLY_FUTSAL_SHOES))
+                .limitGender(String.valueOf(LimitGender.ONLY_MALE))
+                .price(20000)
+                .userId("1")
+                .stadiumId("1")
+                .build());
+
+        mockMatches.add(MatchResponseDto.builder()
+                .startTime(LocalDateTime.now())
+                .finishTime(LocalDateTime.now().plusHours(2))
+                .minNumber(6)
+                .maxNumber(12)
+                .number(8)
+                .rule(String.valueOf(Rule.FIVE_VS_FIVE_TWO_TEAM))
+                .matchStatus(String.valueOf(MatchStatus.OPEN))
+                .limitLevel(String.valueOf(LimitLevel.UPPER_AMATEUR))
+                .limitShoes(String.valueOf(LimitShoes.ONLY_FUTSAL_SHOES))
+                .limitGender(String.valueOf(LimitGender.ALL))
+                .price(10000)
+                .userId("1")
+                .stadiumId("2")
+                .build());
+
+        mockMatches.add(MatchResponseDto.builder()
+                .startTime(LocalDateTime.now())
+                .finishTime(LocalDateTime.now().plusHours(2))
+                .minNumber(6)
+                .maxNumber(12)
+                .number(12)
+                .rule(String.valueOf(Rule.FIVE_VS_FIVE_TWO_TEAM))
+                .matchStatus(String.valueOf(MatchStatus.OPEN))
+                .limitLevel(String.valueOf(LimitLevel.UPPER_AMATEUR))
+                .limitShoes(String.valueOf(LimitShoes.ONLY_FUTSAL_SHOES))
+                .limitGender(String.valueOf(LimitGender.ALL))
+                .price(20000)
+                .userId("1")
+                .stadiumId("3")
+                .build());
+
+        return mockMatches;
     }
 }
