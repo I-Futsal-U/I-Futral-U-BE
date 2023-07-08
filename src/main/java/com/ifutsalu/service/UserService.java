@@ -7,7 +7,10 @@ import com.ifutsalu.dto.request.UserUpdateRequestDto;
 import com.ifutsalu.dto.response.UserResponseDto;
 import com.ifutsalu.dto.response.UserUpdateResponse;
 import com.ifutsalu.exception.AlreadyManagerRoleException;
+import com.ifutsalu.exception.CustomException;
+import com.ifutsalu.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +47,7 @@ public class UserService {
     public void updateUserRole(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new RuntimeException("유저 정보가 없습니다");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         if(user.get().getRole().equals(Role.ROLE_MANAGER)) {
             throw new AlreadyManagerRoleException("이미 매니저 권한을 가지고 있습니다");

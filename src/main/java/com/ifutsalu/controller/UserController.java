@@ -1,9 +1,13 @@
 package com.ifutsalu.controller;
 
+import com.amazonaws.services.s3.event.S3EventNotification;
 import com.ifutsalu.domain.match.Matching;
 import com.ifutsalu.domain.match.matchParticipation.MatchParticipation;
 import com.ifutsalu.domain.match.review.Review;
 import com.ifutsalu.domain.payment.Payment;
+import com.ifutsalu.domain.user.Gender;
+import com.ifutsalu.domain.user.Level;
+import com.ifutsalu.domain.user.Role;
 import com.ifutsalu.domain.user.User;
 import com.ifutsalu.dto.request.UserUpdateRequestDto;
 import com.ifutsalu.dto.response.*;
@@ -15,9 +19,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,36 +40,88 @@ public class UserController {
     /**
      * 회원 프로필 조회
      */
-    @Operation(summary = "회원 프로필 조회", description = "회원 프로필을 조회합니다", tags = {"UserController"})
+    @Operation(summary = "회원 프로필 조회", description = "현재 접속중인 회원의 프로필을 조회합니다", tags = {"UserController"})
     @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not found")
     @GetMapping("/me")
+//    public ResponseEntity<UserResponseDto> findUserInfoById() {
+//        return ResponseEntity.ok(userService.findUserInfoById(SecurityUtil.getCurrentUserId()));
+//    }
     public ResponseEntity<UserResponseDto> findUserInfoById() {
-        return ResponseEntity.ok(userService.findUserInfoById(SecurityUtil.getCurrentUserId()));
+        User user = User.builder()
+                .email("th8260@naver.com")
+                .profileImageUrl("이미지 url")
+                .name("홍길동")
+                .address("서울 강남구 강남대로 44")
+                .level(Level.BEGINNER)
+                .phone("010-1234-5678")
+                .gender(Gender.MALE)
+                .birth(LocalDate.of(1994, 4, 17))
+                .build();
+        UserResponseDto userResponseDto = UserResponseDto.of(user);
+
+        return ResponseEntity.ok(userResponseDto);
     }
+
 
     /**
      * 회원 프로필 수정
      */
-    @Operation(summary = "회원 프로필 수정", description = "회원 프로필을 수정합니다", tags = {"UserController"})
+    @Operation(summary = "회원 프로필 수정", description = "현재 로그인한 회원 프로필을 수정합니다(json 수정하지 마시고 그냥 excute 누르시면됩니다.)", tags = {"UserController"})
     @ApiResponse(responseCode = "200", description = "OK")
-    @PutMapping("/me")
-    public ResponseEntity<UserUpdateResponse> updateUserInfo(@RequestBody UserUpdateRequestDto updateUserRequestDto) {
-        Long userId = SecurityUtil.getCurrentUserId();
-        UserUpdateResponse updatedUser = userService.updateUserInfo(userId, updateUserRequestDto);
-        return ResponseEntity.ok(updatedUser);
+    @ApiResponse(responseCode = "400", description = "Bad Requset")
+    @PatchMapping("/me")
+//    public ResponseEntity<UserUpdateResponse> updateUserInfo(@RequestBody UserUpdateRequestDto updateUserRequestDto) {
+//        Long userId = SecurityUtil.getCurrentUserId();
+//        UserUpdateResponse updatedUser = userService.updateUserInfo(userId, updateUserRequestDto);
+//        return ResponseEntity.ok(updatedUser);
+//    }
+    public ResponseEntity<UserUpdateResponse> updateUserInfo(@RequestBody() UserUpdateRequestDto updateUserRequestDto) {
+        User user = User.builder()
+                .profileImageUrl("이미지url")
+                .address("역삼동")
+                .phone("010-9454-1234")
+                .build();
+
+        UserUpdateResponse userUpdateResponse = UserUpdateResponse.of(user);
+        return ResponseEntity.ok(userUpdateResponse);
+
+
     }
 
     /**
      * 회원 권한 매니저로 변경하기
      */
-    @Operation(summary = "회원 권한 매니저로 수정", description = "회원 권한을 매니저로 수정합니다", tags = {"UserController"})
+    @Operation(summary = "회원 권한 매니저로 수정", description = "회원 권한을 매니저로 수정합니다(관리자만 접근 가능합니다)", tags = {"UserController"})
     @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "404", description = "Not Found")
 //    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/update/{userId}")
-    public ResponseEntity<?> updateUserRole(@PathVariable Long userId) {
+    public ResponseEntity<Void> updateUserRole(@Parameter(description = "유저 ID(현재 user1은 유저, user2는 매니저라고 가정)") @PathVariable Long userId) {
+        User user1 = User.builder()
+                .id(1L)
+                .role(Role.ROLE_USER)
+                .build();
 
-        userService.updateUserRole(userId);
-        return ResponseEntity.ok().build();
+        User user2 = User.builder()
+                .id(2L)
+                .role(Role.ROLE_MANAGER)
+                .build();
+
+        if(userId == 1L) {
+            return ResponseEntity.ok().build();
+        }
+        else if(userId == 2L) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.notFound().build();
+
+
+
+//        userService.updateUserRole(userId); 실전 코드
+//        return ResponseEntity.ok().build();    실전 코드
     }
 
     /**
@@ -77,10 +135,6 @@ public class UserController {
         // 목데이터 생성
         List<Review> reviews = createMockReviews(userId);
 
-        if (reviews == null) {
-            //리뷰를 찾을 수 없을 경우 예외처리
-            return ResponseEntity.notFound().build();
-        }
 
         List<ReviewDto> reviewResponses = reviews.stream()
                 .map(ReviewDto::fromEntity)
