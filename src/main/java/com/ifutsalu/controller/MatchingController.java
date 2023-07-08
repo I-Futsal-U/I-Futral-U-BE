@@ -5,6 +5,7 @@ import com.ifutsalu.dto.response.MatchResponseDto;
 import com.ifutsalu.dto.response.WeeklyMatchResponseDto;
 import com.ifutsalu.service.MatchDummyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class MatchingController {
     @ApiResponse(responseCode = "200", description = "유저가 예약한 매칭 정보를 반환합니다.")
     @ApiResponse(responseCode = "404", description = "유저가 예약한 매칭 정보를 찾을 수 없습니다.")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getMatchesByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<MatchResponseDto>> getMatchesByUserId(@Parameter(description = "유저 ID", example = "1") @PathVariable("userId") Long userId) {
         // List<MatchResponseDto> matchResponseDtos = matchingTestService.getMatchesByUserId(userId);
         List<MatchResponseDto> matchResponseDtos = matchDummyService.createMockMatches(userId);
         return ResponseEntity.ok(matchResponseDtos);
@@ -52,7 +53,7 @@ public class MatchingController {
     @ApiResponse(responseCode = "200", description = "매니저가 담당하고 있는 매칭 정보를 반환합니다.")
     @ApiResponse(responseCode = "404", description = "매니저가 담당하고 있는 매칭 정보를 찾을 수 없습니다.")
     @GetMapping("/manager/{userId}")
-    public ResponseEntity<?> getMatchesByManager(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<MatchResponseDto>> getMatchesByManager(@Parameter(description = "유저 ID(user의 권한은 매니저라고 가정)", example = "1") @PathVariable("userId") Long userId) {
         // List<MatchResponseDto> matchResponseDtos = matchingTestService.getMatchesByManager(userId);
         List<MatchResponseDto> matchResponseDtos = matchDummyService.createMockMatches(userId);
         return ResponseEntity.ok(matchResponseDtos);
