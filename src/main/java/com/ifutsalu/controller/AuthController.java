@@ -29,7 +29,7 @@ public class AuthController {
      * @param userRequestDto 회원 가입 요청 정보
      * @return 회원 가입 결과 메시지
      */
-    @Operation(summary = "회원 프로필 조회", description = "현재 접속중인 회원의 프로필을 조회합니다", tags = {"AuthController"})
+    @Operation(summary = "회원가입", description = "회원가입입니다.", tags = {"AuthController"})
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "404", description = "Not found")
     @PostMapping("/join")
